@@ -1,0 +1,19 @@
+import ts from 'typescript'
+
+const compilerOptions: ts.CompilerOptions = {
+  target: ts.ScriptTarget.ES2020,
+  module: ts.ModuleKind.ESNext,
+  lib: ['ES2020'],
+  jsx: ts.JsxEmit.Preserve,
+  declaration: true,
+  outDir: './dist',
+  rootDir: './src',
+  strict: true,
+  esModuleInterop: true,
+  skipLibCheck: true,
+  forceConsistentCasingInFileNames: true,
+  resolveJsonModule: true,
+  moduleResolution: ts.ModuleResolutionKind.Node,
+}
+
+export default compilerOptions

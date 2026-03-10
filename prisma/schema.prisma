@@ -1,0 +1,113 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  username          String    @unique
+  password_hash     String?
+  name              String?
+  avatar_url        String?
+  google_id         String?   @unique
+  theme             String    @default("light")
+  notifications_enabled Boolean @default(true)
+  subscription_tier String    @default("free")
+  questions_today   Int       @default(0)
+  daily_limit       Int       @default(5)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
+
+  subscriptions Subscription[]
+  quizzes       Quiz[]
+  bookmarks     Bookmark[]
+  invoices      Invoice[]
+
+  @@index([email])
+  @@index([google_id])
+}
+
+model Subscription {
+  id                    String    @id @default(cuid())
+  user_id               String
+  tier                  String    @default("free")
+  stripe_customer_id    String?   @unique
+  stripe_subscription_id String?   @unique
+  status                String    @default("active")
+  current_period_start  DateTime?
+  current_period_end    DateTime?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([stripe_customer_id])
+}
+
+model Quiz {
+  id                String    @id @default(cuid())
+  user_id           String
+  exam_id           String?
+  topic_id          String?
+  score             Float?
+  total_questions   Int
+  correct_answers   Int?
+  duration_minutes  Int?
+  status            String    @default("completed")
+  created_at        DateTime  @default(now())
+
+  user      User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@index([user_id])
+}
+
+model QuizQuestion {
+  id                  String    @id @default(cuid())
+  quiz_id             String
+  question_text       String?
+  question_id         String?
+  selected_option_id  String?
+  correct_option_id   String?
+  is_correct          Boolean?
+  time_spent_seconds  Int?
+  explanation         String?
+
+  quiz Quiz @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
+
+  @@index([quiz_id])
+}
+
+model Bookmark {
+  id           String    @id @default(cuid())
+  user_id      String
+  question_id  String
+  created_at   DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model Invoice {
+  id                String    @id @default(cuid())
+  user_id           String
+  stripe_invoice_id String?   @unique
+  amount            Float
+  currency          String    @default("USD")
+  status            String    @default("paid")
+  created_at        DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([stripe_invoice_id])
+}

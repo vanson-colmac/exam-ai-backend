@@ -3,18 +3,30 @@ name: Deploy Backend
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
+    
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - run: npm ci
-      - run: npm run build
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
       - name: Deploy to Railway
-        uses: baishancloud/railway-action@v1
-        with:
-          token: ${{ secrets.RAILWAY_TOKEN }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          npm install -g @railway/cli
+          railway up --detach

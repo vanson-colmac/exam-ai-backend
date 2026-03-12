@@ -26,8 +26,11 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "latest",
+    "@types/cors": "^2.8.19",
     "@types/express": "latest",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "latest",
+    "@types/nodemailer": "^7.0.11",
     "tsx": "latest",
     "typescript": "latest"
   },

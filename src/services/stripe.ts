@@ -3,7 +3,7 @@
 import stripe from 'stripe'
 
 const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2020-08-27' as any,
 })
 
 export const createCustomer = async (email: string, name: string) => {
